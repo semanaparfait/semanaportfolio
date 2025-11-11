@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chatbot with OpenAI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .chatbot-container {
+      width: 360px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+    }
+    .chat-window {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ddd;
+    }
+    .message {
+      max-width: 80%;
+      padding: 10px 15px;
+      border-radius: 15px;
+      margin-bottom: 10px;
+      word-wrap: break-word;
+    }
+    .user {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+      text-align: right;
+    }
+    .bot {
+      background-color: #ececec;
+      align-self: flex-start;
+      text-align: left;
+    }
+    .input-area {
+      display: flex;
+      padding: 10px;
+      gap: 10px;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    .input-area button {
+      background-color: #25d366;
+      border: none;
+      padding: 10px 18px;
+      color: white;
+      font-weight: bold;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chatbot-container">
+  <div class="chat-window" id="chat-window">
+    <div class="message bot">Hello! I’m your portfolio assistant. Ask me anything.</div>
+  </div>
+  <div class="input-area">
+    <input id="user-input" type="text" placeholder="Type your message..." />
+    <button id="send-btn">Send</button>
+  </div>
+</div>
+
+<script>
+  const chatWindow = document.getElementById('chat-window');
+  const input = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+
+  // Keep full conversation for context
+  let messages = [
+    { role: "system", content: "You are a helpful assistant for a developer portfolio website." }
+  ];
+
+  function addMessage(text, className) {
+    const div = document.createElement('div');
+    div.className = 'message ' + className;
+    div.textContent = text;
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    messages.push({ role: "user", content: text });
+    input.value = "";
+    input.disabled = true;
+    sendBtn.disabled = true;
+
+    try {
+      const res = await fetch('http://localhost:5000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages }),
+      });
+
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+
+      addMessage(data.reply, 'bot');
+      messages.push({ role: "assistant", content: data.reply });
+    } catch (error) {
+      addMessage("Sorry, something went wrong. Please try again.", 'bot');
+    }
+
+    input.disabled = false;
+    sendBtn.disabled = false;
+    input.focus();
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+</script>
+
+</body>
+</html>

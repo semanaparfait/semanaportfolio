@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot with History</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e9ecef;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #343a40;
+    }
+
+    #chatbox {
+      width: 100%;
+      max-width: 500px;
+      height: 400px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+      overflow-y: scroll;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+
+    .user, .bot {
+      margin: 10px 0;
+      line-height: 1.4;
+    }
+
+    .user { color: blue; }
+    .bot { color: green; }
+
+    #inputArea {
+      display: flex;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    #userInput {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+
+    #sendBtn {
+      padding: 10px 20px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    #sendBtn:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Chatbot 🤖</h2>
+  <div id="chatbox"></div>
+
+  <div id="inputArea">
+    <input type="text" id="userInput" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <script>
+    const sendBtn = document.getElementById("sendBtn");
+    const userInput = document.getElementById("userInput");
+    const chatbox = document.getElementById("chatbox");
+
+    // Load chat history from localStorage
+    const history = localStorage.getItem("chatHistory");
+    if (history) chatbox.innerHTML = history;
+
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    function sendMessage() {
+      const message = userInput.value.trim();
+      if (message === "") return;
+
+      const userMessage = `<div class="user"><strong>You:</strong> ${message}</div>`;
+      chatbox.innerHTML += userMessage;
+
+      const reply = getBotReply(message.toLowerCase());
+      const botMessage = `<div class="bot"><strong>Bot:</strong> ${reply}</div>`;
+      chatbox.innerHTML += botMessage;
+
+      // Save to localStorage
+      localStorage.setItem("chatHistory", chatbox.innerHTML);
+
+      userInput.value = "";
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function getBotReply(message) {
+      if (message.includes("hello") || message.includes("hi")) {
+        return "Hi there! How can I help you today?";
+      } else if (message.includes("how are you")) {
+        return "I'm doing great, thanks for asking!";
+      } else if (message.includes("bye")) {
+        return "Goodbye! Have a wonderful day!";
+      } else if (message.includes("help")) {
+        return "You can try typing: hello, bye, help.";
+      } else {
+        return "Sorry, I didn’t understand. Try 'hello', 'bye', or 'help'.";
+      }
+    }
+  </script>
+
+</body>
+</html>
