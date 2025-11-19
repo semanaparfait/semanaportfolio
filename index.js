@@ -1,4 +1,168 @@
+const projects_data = document.getElementById("project-image");
+const project_title = document.getElementById("project-name");
+const project_link = document.getElementById("project-link");
+const project_description = document.getElementById("project-description");
+const project_technologies = document.getElementById("project-technologies");
+
+
+const personal_projects = [
+  {
+    title: "MovieLand",
+    description: "A movie streaming and discovery platform built with React, Node.js, and PostgreSQL. It includes user authentication, admin features, uploads, and payment integrations.",
+    image: "/images/projects/Screenshot (84).png",
+    technologies: ["React", "Tailwind", "Node.js", "Express", "PostgreSQL"],
+    link: "https://movieland.me/"
+  },
+  {
+    title: "PlayerPlatform",
+    description: "A content and media platform where creators upload, share, and manage their videos. Built with a modern frontend and scalable backend.",
+    image: "/images/projects/Screenshot (86).png",
+    technologies: ["React", "Tailwind", "Node.js"],
+    link: "https://playerplatform.org/"
+  },
+  {
+  title: "TechVibe Africa",
+  description: "A dynamic technology company that provides end-to-end IT solutions including software development, cybersecurity services, system integration, and digital transformation for businesses across Africa.",
+  image: "/images/projects/Screenshot (92).png",
+  technologies: ["React", "Tailwind", "Node.js"],
+  link: "https://techvibe.onrender.com/"
+},
+{
+  title: "Bridge School",
+  description: "An educational platform designed for a modern learning experience, offering information about programs, admissions, school activities, and student resources. Built to help parents, students, and educators easily connect with the school.",
+  image: "/images/projects/Screenshot (90).png",
+  technologies: ["React", "Tailwind", "Node.js"],
+  link: "https://bridge-school.onrender.com/"
+},
+{
+  title: "Einstein Plumbers",
+  description: "A plumbing service platform where users can buy high-quality plumbing tools and easily book professional technicians for home or commercial repairs. Designed to simplify plumbing solutions with fast access to products and services.",
+  image: "/images/projects/Screenshot (88).png",
+  technologies: ["React", "Tailwind", "Node.js"],
+  link: "https://einstein-plumbers.onrender.com/"
+}
+
+
+
+];
+
+
+
 // -----------------------------function to display all apps----------------------
+
+// Render `personal_projects` into the page and wire thumbnails to the featured IDs
+let currentProjectIndex = 0;
+
+function renderProject(index = 0) {
+    const proj = personal_projects[index];
+    if (!proj) return;
+    currentProjectIndex = index;
+
+    const imgEl = document.getElementById('project-image');
+    const nameEl = document.getElementById('project-name');
+    const linkEl = document.getElementById('project-link');
+    const descEl = document.getElementById('project-description');
+    const techEl = document.getElementById('project-technologies');
+
+    if (imgEl) imgEl.src = proj.image;
+    if (nameEl) nameEl.innerText = proj.title;
+    if (linkEl) {
+        linkEl.href = proj.link || '#';
+        linkEl.innerText = proj.link || proj.title;
+    }
+    if (descEl) descEl.innerText = proj.description;
+    if (techEl) techEl.innerText = (proj.technologies || []).join(', ');
+}
+
+function renderProjectsThumbnails() {
+    const container = document.querySelector('.portfolio-projects');
+    if (!container) return;
+
+    // remove previous generated wrapper if exists
+    const existing = container.querySelector('.generated-project-thumbs');
+    if (existing) existing.remove();
+
+    const thumbWrapper = document.createElement('div');
+    thumbWrapper.className = 'generated-project-thumbs';
+    thumbWrapper.style.display = 'flex';
+    thumbWrapper.style.gap = '1rem';
+    thumbWrapper.style.flexWrap = 'wrap';
+    thumbWrapper.style.marginTop = '1rem';
+
+    personal_projects.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'project-thumb';
+        card.style.cursor = 'pointer';
+        card.style.width = '180px';
+        card.innerHTML = `
+            <img src="${p.image}" alt="${p.title}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;">
+            <h4 style="font-size:1rem;margin:6px 0;">${p.title}</h4>
+        `;
+        card.addEventListener('click', () => renderProject(i));
+        thumbWrapper.appendChild(card);
+    });
+
+    // Insert thumbnails near the top of the projects container
+    // If there's a firstChild, insert after it; otherwise append
+    if (container.firstChild) {
+        container.insertBefore(thumbWrapper, container.firstChild.nextElementSibling || null);
+    } else {
+        container.appendChild(thumbWrapper);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // populate featured area with the first project and render thumbnails
+    renderProject(0);
+    renderProjectsThumbnails();
+    // wire click on featured image to open detailed popup
+    const featuredImg = document.getElementById('project-image');
+    if (featuredImg) {
+        featuredImg.style.cursor = 'pointer';
+        featuredImg.addEventListener('click', openFeaturedProjectPopup);
+    }
+});
+
+// Open the existing portfolio card modal and populate it with the current project
+function openFeaturedProjectPopup() {
+    const proj = personal_projects[currentProjectIndex];
+    if (!proj) return;
+
+    // Use unique modal IDs
+    const cardImg = document.getElementById('modal-project-image');
+    const cardTitle = document.getElementById('modal-project-title');
+    const cardDesc = document.getElementById('modal-project-description');
+    const cardLink = document.getElementById('modal-project-link');
+    const cardContainer = document.querySelector('.portfolio-card');
+
+    if (cardImg) cardImg.src = proj.image;
+    if (cardTitle) cardTitle.innerText = proj.title;
+    if (cardDesc) cardDesc.innerText = proj.description;
+    if (cardLink) {
+        cardLink.href = proj.link || '#';
+        cardLink.innerText = proj.link || 'Visit project';
+        cardLink.target = '_blank';
+    }
+
+    // populate technology slots if they exist
+    const techEls = [
+        document.getElementById('modal-technology-skills'),
+        document.getElementById('modal-technology-skills2'),
+        document.getElementById('modal-technology-skills3'),
+        document.getElementById('modal-technology-skills4'),
+        document.getElementById('modal-technology-skills5'),
+        document.getElementById('modal-technology-skills6')
+    ];
+    const techs = proj.technologies || [];
+    techEls.forEach((el, i) => {
+        if (!el) return;
+        el.innerText = techs[i] || '';
+    });
+
+    if (cardContainer) {
+        cardContainer.style.display = 'block';
+    }
+}
 // function displayApps(){
 //     document.querySelector(".all-apps").style.display="flex";
 // }

@@ -11,6 +11,8 @@ body, html {
     width: 100%;
     overflow-x: hidden;
   }
+  /* ----------------------project-technologies----------------- */
+
 /* ---------------chatbot-------------- */
 .chat-bot{
     background-color: #1cac1c;
@@ -1954,6 +1956,7 @@ nav{
                     flex-direction: column;
                     text-align: center;
                     color: rgb(0, 0, 0);
+                    font-size: 13px;
                     i{
                         font-weight: 600;
                     }
